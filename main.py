@@ -58,7 +58,7 @@ try:
         zRow = []
         for t in range(T+1):
             varName = 'Z_m{0}_t{1}'.format(m, t)
-            idle = m.addVar(lb=0.0, ub=GRB.INFINITY, vtype=GRB.CONTINUOUS, name=varName)
+            idle = pladdLPM.addVar(lb=0.0, ub=GRB.INFINITY, vtype=GRB.CONTINUOUS, name=varName)
             zSum.addTerms(1.0, idle)
             zRow.append(idle)
         z.append(zRow)
@@ -69,7 +69,7 @@ try:
         for j in range(len(length[m])):
             thisJobStarts = []
             for t in range(T+1):
-                thisJobStarts.append(m.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
+                thisJobStarts.append(pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
             jobStartTimes.append(thisJobStarts)
         x.append(jobStartTimes)
 
@@ -81,14 +81,50 @@ try:
     # x = m.addVar(vtype=GRB.CONTINUOUS, name="x")
     # y = m.addVar(vtype=GRB.CONTINUOUS, name="y")
 
+    # For a job j, jobs with a greater index much start after j ends
     for m in range(M):
         n = len(length[m])
         for i in range(n):
             for j in range(n):
                 if (i > j):
                     for t in range(T):
-                        m.addConstr(quicksum(x[m][i][:(t+length[m][j]-2)]) <= 1.0, 'C: jobs with j > {0} must start after job j = {1} ends'.format(j, j))
+                        ub = t+length[m][j] - 1 + 1 # Since t uses zero-based indexes we don't need to subtract 1 from the original upper bound. We do add 1 because slicing an array means for each index i st. lb <= i < ub
+                        pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][:ub]) <= 1.0, 'C: jobs after job{0} must start after job{1} ends for server{2}'.format(j, j, m))
 
+    # Jobs with an index less than j must end before j starts
+    for m in range(M):
+        n = len(length[m])
+        for i in range(n):
+            for j in range(n):
+                if (i < j):
+                    for t in range(T):
+                        lb = t-length[m][j]+1 # Since t uses zero-based indexes we don't need to subtract 1 from the original lower bound
+                        lb = min(lb, 0)
+                        pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][lb:]) <= 1.0, 'C: jobs before job{0} must end before job{1} starts for server{2}'.format(j, j, m))
+
+    # Calculate idle time
+    for m in range(M):
+        n = len(length[m])
+        for t in range(T):
+            expr = LinExpr(0.0)
+            expr.addTerms(1.0, z[m][t])
+            for i in range(n):
+                lb = t - length[m][i] + 1 # Since t uses zero-based indexes we don't need to subtract 1 from the original lower bound
+                ub = t + 1 # Since t uses zero-based indexes we don't need to subtract 1 from the original upper bound. We do add 1 because slicing an array means for each index i st. lb <= i < ub
+                lb = min(lb, 0)
+                expr.addTerms(1.0, quicksum(x[m][i][lb:ub]))
+            pladdLPM.addConstr(expr >= 1.0, 'C: idle time constaint for m{0}, t{1}'.format(m, t))
+
+    # Jobs may only start at the takes, which are budgeted
+    for m in range(M):
+        n = len(length[m])
+        for t in range(T):
+            expr = LinExpr(0.0)
+            for j in range(n):
+                expr.addTerms(1.0, x[m][j][t])
+            pladdLPM.addConstr(expr <= y[t], 'C: jobs can only start at take{0} for server {1}'.format(t, m))
+
+    pladdLPM.addConstr(quicksum(y) <= K, 'C: sum(y) <= k')
 
     # # Set objective
     # # m.setObjective(x + y, GRB.MINIMIZE)

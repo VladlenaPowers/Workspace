@@ -8,26 +8,42 @@ def printvar(name, value):
     print('{0} = {1}'.format(name, value))
     return
 
-def preprocessing(T,K,length):
+def preprocessing(T,K,serverjobs):
+    T = T + 1
+    if len(serverjobs) > (K+1):
+        serverjobs = serverjobs[:K+1]
+    if len(serverjobs) <= K and sum(serverjobs) < T:
+        return 'Not enought jobs on this server'
+    if serverjobs[0] > T:
+        serverjobs[0] = T
+        serverjobs = serverjobs[:1]
+        K = 0
+    totallength = serverjobs[0]
+    K = len(serverjobs) - 1
+    for i in range (1, K+1):
+        if totallength + serverjobs[i] > T:
+            serverjobs[i] = T - totallength
+            serverjobs = serverjobs[:i+1]
+            if serverjobs[i] == 0:
+                serverjobs = serverjobs[:i]
+            break
+        totallength = totallength + serverjobs[i]
+    return serverjobs
 
-    return
 try:
-
-
-    length = [[1, 2, 3], [1, 1]]
-    T = 2;
-    K = 3;
+    length = [[1,90,10,11,23,132,1], [200,1,3,2,3,4,5,3,4],[30]]
+    T = 2
+    K = 2
     M = len(length)
-    N = len(length[0])
-    print(T)
-    print('T = {0}'.format(T))
-    print('K = {0}'.format(K))
-    print('M = {0}'.format(M))
-    print('N = {0}\n'.format(N))
+    for i in range (0,M):
+        print('{3}{0}{1} = {2}'.format('server ', i, length[i],"Before preprocessing  "))
+    for i in range (0,M):
+        length[i] = preprocessing(T,K,length[i])
+    for i in range (0,M):
+        print('{3}{0}{1} = {2}'.format('server ', i, length[i],"After preprocessing  "))
     printvar('T',T)
     printvar('K',K)
-    printvar('M',M)
-    printvar('N',N)
+
 
     # Create a new model
     m = Model("model0")

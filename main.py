@@ -31,46 +31,50 @@ def preprocessing(T,K,serverjobs):
     return serverjobs
 
 try:
-    length = [[1,90,10,11,23,132,1], [200,1,3,2,3,4,5,3,4],[30]]
-    T = 2
+    length = [[1,90,10,11,23,132,1], [200,1,3,2,3,4,5,3,4],[1,1,1]]
+    T = 3
     K = 2
     M = len(length)
-    for i in range (0,M):
+    for i in range (M):
         print('{3}{0}{1} = {2}'.format('server ', i, length[i],"Before preprocessing  "))
-    for i in range (0,M):
+    for i in range (M):
         length[i] = preprocessing(T,K,length[i])
-    for i in range (0,M):
+    for i in range (M):
         print('{3}{0}{1} = {2}'.format('server ', i, length[i],"After preprocessing  "))
     printvar('T',T)
     printvar('K',K)
-
+    sumOfLengthServerJobs = []
+    for i in range (M):
+        sumOfLengths = sum(length[i])
+        sumOfLengthServerJobs.append(sumOfLengths)
+        print('{0}{1} = {2}'.format('length of jobs on server', i, sumOfLengths))
 
     # Create a new model
     m = Model("model0")
-
-    z = []
-    zSum = LinExpr(0.0)
-    for m in range(M):
-        zRow = []
-        for t in range(T):
-            idle = m.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='Z_m{0}_t{1}'.format(m, t))
-            zSum.addTerms(1.0, idle)
-            zRow.append(idle)
-        z.append(zRow)
-
-    m.update()
-    m.setObjective(zSum, GRB.MINIMIZE)
-
-    x = []
-    for m in range(M):
-        jobStartTimes = []
-        for j in range(len(length[m])):
-            thisJobStarts = []
-            for t in range(T):
-                thisJobStarts.append(m.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
-            jobStartTimes.append(thisJobStarts)
-        x.append(jobStartTimes)
-
+    #
+    # z = []
+    # zSum = LinExpr(0.0)
+    # for m in range(M):
+    #     zRow = []
+    #     for t in range(T+1):
+    #         varName = 'Z_m{0}_t{1}'.format(m, t)
+    #         idle = m.addVar(lb=0.0, ub=GRB.INFINITY, vtype=GRB.CONTINUOUS, name=varName)
+    #         zSum.addTerms(1.0, idle)
+    #         zRow.append(idle)
+    #     z.append(zRow)
+    #
+    # x = []
+    # for m in range(M):
+    #     jobStartTimes = []
+    #     for j in range(len(length[m])):
+    #         thisJobStarts = []
+    #         for t in range(T+1):
+    #             thisJobStarts.append(m.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
+    #         jobStartTimes.append(thisJobStarts)
+    #     x.append(jobStartTimes)
+    #
+    # m.update()
+    # m.setObjective(zSum, GRB.MINIMIZE)
 
 
     # # Create variables
@@ -87,7 +91,7 @@ try:
     # # m.addConstr(2 * x + 3 * y == 5, "c0")
     # # m.addRange(x + 0, 0.0, 1.0, "c1")
 
-    m.optimize()
+    # m.optimize()
 
     # for v in m.getVars():
     #     print('%s %g' % (v.varName, v.x))

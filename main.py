@@ -50,7 +50,7 @@ try:
         print('{0}{1} = {2}'.format('length of jobs on server', i, sumOfLengths))
 
     # Create a new model
-    m = Model("model0")
+    pladdLPM = Model("model0")
 
     z = []
     zSum = LinExpr(0.0)
@@ -73,8 +73,8 @@ try:
             jobStartTimes.append(thisJobStarts)
         x.append(jobStartTimes)
 
-    m.update()
-    m.setObjective(zSum, GRB.MINIMIZE)
+    pladdLPM.update()
+    pladdLPM.setObjective(zSum, GRB.MINIMIZE)
 
 
     # # Create variables
@@ -87,7 +87,7 @@ try:
             for j in range(n):
                 if (i > j):
                     for t in range(T):
-                        m.addConstr(quicksum(x[m][i][:(t+l[j]-2)]) <= 1.0, 'C: jobs with j > {0} must start after job j = {1} ends'.format(j, j))
+                        m.addConstr(quicksum(x[m][i][:(t+length[m][j]-2)]) <= 1.0, 'C: jobs with j > {0} must start after job j = {1} ends'.format(j, j))
 
 
     # # Set objective
@@ -97,7 +97,7 @@ try:
     # # m.addConstr(2 * x + 3 * y == 5, "c0")
     # # m.addRange(x + 0, 0.0, 1.0, "c1")
 
-    # m.optimize()
+    pladdLPM.optimize()
 
     # for v in m.getVars():
     #     print('%s %g' % (v.varName, v.x))

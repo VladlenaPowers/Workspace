@@ -51,30 +51,30 @@ try:
 
     # Create a new model
     m = Model("model0")
-    #
-    # z = []
-    # zSum = LinExpr(0.0)
-    # for m in range(M):
-    #     zRow = []
-    #     for t in range(T+1):
-    #         varName = 'Z_m{0}_t{1}'.format(m, t)
-    #         idle = m.addVar(lb=0.0, ub=GRB.INFINITY, vtype=GRB.CONTINUOUS, name=varName)
-    #         zSum.addTerms(1.0, idle)
-    #         zRow.append(idle)
-    #     z.append(zRow)
-    #
-    # x = []
-    # for m in range(M):
-    #     jobStartTimes = []
-    #     for j in range(len(length[m])):
-    #         thisJobStarts = []
-    #         for t in range(T+1):
-    #             thisJobStarts.append(m.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
-    #         jobStartTimes.append(thisJobStarts)
-    #     x.append(jobStartTimes)
-    #
-    # m.update()
-    # m.setObjective(zSum, GRB.MINIMIZE)
+
+    z = []
+    zSum = LinExpr(0.0)
+    for m in range(M):
+        zRow = []
+        for t in range(T+1):
+            varName = 'Z_m{0}_t{1}'.format(m, t)
+            idle = m.addVar(lb=0.0, ub=GRB.INFINITY, vtype=GRB.CONTINUOUS, name=varName)
+            zSum.addTerms(1.0, idle)
+            zRow.append(idle)
+        z.append(zRow)
+
+    x = []
+    for m in range(M):
+        jobStartTimes = []
+        for j in range(len(length[m])):
+            thisJobStarts = []
+            for t in range(T+1):
+                thisJobStarts.append(m.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
+            jobStartTimes.append(thisJobStarts)
+        x.append(jobStartTimes)
+
+    m.update()
+    m.setObjective(zSum, GRB.MINIMIZE)
 
 
     # # Create variables

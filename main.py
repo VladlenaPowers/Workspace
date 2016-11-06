@@ -76,10 +76,16 @@ try:
     # # Create variables
     # x = m.addVar(vtype=GRB.CONTINUOUS, name="x")
     # y = m.addVar(vtype=GRB.CONTINUOUS, name="y")
-    #
-    # Integrate new variables
-    # m.update()
-    #
+
+    for m in range(M):
+        n = len(length[m])
+        for i in range(n):
+            for j in range(n):
+                if (i > j):
+                    for t in range(T):
+                        m.addConstr(quicksum(x[m][i][:(t+l[j]-2)]) <= 1.0, 'C: jobs with j > {0} must start after job j = {1} ends'.format(j, j))
+
+
     # # Set objective
     # # m.setObjective(x + y, GRB.MINIMIZE)
     #

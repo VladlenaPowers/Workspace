@@ -58,7 +58,7 @@ try:
         zRow = []
         for t in range(T+1):
             varName = 'Z_m{0}_t{1}'.format(m, t)
-            idle = pladdLPM.addVar(lb=0.0, ub=GRB.INFINITY, vtype=GRB.CONTINUOUS, name=varName)
+            idle = pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name=varName)
             zSum.addTerms(1.0, idle)
             zRow.append(idle)
         z.append(zRow)

@@ -87,7 +87,7 @@ try:
         for i in range(n):
             for j in range(n):
                 if (i > j):
-                    for t in range(T):
+                    for t in range(T+1):
                         ub = t+length[m][j] - 1 + 1 # Since t uses zero-based indexes we don't need to subtract 1 from the original upper bound. We do add 1 because slicing an array means for each index i st. lb <= i < ub
                         pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][:ub]) <= 1.0, 'C: jobs after job{0} must start after job{1} ends for server{2}'.format(j, j, m))
 

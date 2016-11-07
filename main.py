@@ -65,8 +65,9 @@ try:
 
     x = []
     for m in range(M):
+        n = len(length[m])
         jobStartTimes = []
-        for j in range(len(length[m])):
+        for j in range(n):
             thisJobStarts = []
             for t in range(T+sumOfLengthServerJobs[m]+1):
                 thisJobStarts.append(pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))

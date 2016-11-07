@@ -125,19 +125,9 @@ try:
 
     pladdLPM.addConstr(quicksum(y) <= K, 'C: sum(y) <= k')
 
-    # # Set objective
-    # # m.setObjective(x + y, GRB.MINIMIZE)
-    #
-    # # Add constraint: x + 2 y + 3 z <= 4
-    # # m.addConstr(2 * x + 3 * y == 5, "c0")
-    # # m.addRange(x + 0, 0.0, 1.0, "c1")
 
     pladdLPM.optimize()
 
-    # for v in m.getVars():
-    #     print('%s %g' % (v.varName, v.x))
-    #
-    # print('Obj: %g' % m.objVal)
 
 except GurobiError as err:
     print('Encountered a Gurobi ERROR: {0}'.format(err))

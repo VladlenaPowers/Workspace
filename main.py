@@ -110,6 +110,7 @@ try:
                 lb = t - length[m][i] + 1
                 ub = t
                 lb = max(lb, 0)
+                expr.add(quicksum(x[m][i][lb:ub]))
             pladdLPM.addConstr(expr >= 1.0, 'C: idle time constaint for m{0}, t{1}'.format(m, t))
 
 

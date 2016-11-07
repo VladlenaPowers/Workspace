@@ -74,9 +74,17 @@ try:
             jobStartTimes.append(thisJobStarts)
         x.append(jobStartTimes)
 
+    y = []
+    for t in range(T+1):
+        y.append(pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='Y_t{0}'.format(t)))
+
     pladdLPM.update()
     pladdLPM.setObjective(zSum, GRB.MINIMIZE)
 
+    for m in range(M):
+        n = len(length[m])
+        for j in range(n):
+            pladdLPM.addConstr(quicksum(x[m][j]) == 1.0, 'C: every job scheduled for server {0}'.format(m))
 
     # For a job j, jobs with a greater index much start after j ends
     for m in range(M):

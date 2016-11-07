@@ -128,6 +128,19 @@ try:
 
     pladdLPM.optimize()
 
+    print('z')
+    for m in range(M):
+        print(''.join(['['+str(z[m][i].x)+']' for i in range(T+1)]))
+
+
+    for m in range(M):
+        print('x_m{0}'.format(m))
+        for j in range(len(length[m])):
+            print(''.join(['[{:.1f}]'.format(x[m][j][i].x) for i in range(T+sumOfLengthServerJobs[m]+1)]))
+
+    print('y')
+    for t in range(T+1):
+        print('[' + str(y[t].x) +']')
 
 except GurobiError as err:
     print('Gurobi ERROR({0}): {1}'.format(err.errno, err.message))

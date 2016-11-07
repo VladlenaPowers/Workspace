@@ -133,6 +133,7 @@ try:
 
     pladdLPM.addConstr(quicksum(y) <= (K+1), 'C: sum(y) <= k')
 
+    pladdLPM.addConstr(y[0] == 1, 'First jobs on all servers start at time 0')
 
     pladdLPM.optimize()
 

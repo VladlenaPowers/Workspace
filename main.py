@@ -77,10 +77,6 @@ try:
     pladdLPM.setObjective(zSum, GRB.MINIMIZE)
 
 
-    # # Create variables
-    # x = m.addVar(vtype=GRB.CONTINUOUS, name="x")
-    # y = m.addVar(vtype=GRB.CONTINUOUS, name="y")
-
     # For a job j, jobs with a greater index much start after j ends
     for m in range(M):
         n = len(length[m])

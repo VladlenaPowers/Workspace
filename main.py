@@ -97,15 +97,15 @@ try:
         for i in range(n):
             for j in range(n):
                 if (i < j):
-                    for t in range(T):
+                    for t in range(T+1):
                         lb = t-length[m][j]+1 # Since t uses zero-based indexes we don't need to subtract 1 from the original lower bound
-                        lb = min(lb, 0)
+                        lb = max(lb, 0)
                         pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][lb:]) <= 1.0, 'C: jobs before job{0} must end before job{1} starts for server{2}'.format(j, j, m))
 
     # Calculate idle time
     for m in range(M):
         n = len(length[m])
-        for t in range(T):
+        for t in range(T+1):
             expr = LinExpr(0.0)
             expr.addTerms(1.0, z[m][t])
             for i in range(n):
@@ -115,10 +115,11 @@ try:
                 expr.addTerms(1.0, quicksum(x[m][i][lb:ub]))
             pladdLPM.addConstr(expr >= 1.0, 'C: idle time constaint for m{0}, t{1}'.format(m, t))
 
+
     # Jobs may only start at the takes, which are budgeted
     for m in range(M):
         n = len(length[m])
-        for t in range(T):
+        for t in range(T+1):
             expr = LinExpr(0.0)
             for j in range(n):
                 expr.addTerms(1.0, x[m][j][t])

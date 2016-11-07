@@ -131,7 +131,7 @@ try:
                 expr.addTerms(1.0, x[m][j][t])
             pladdLPM.addConstr(expr <= y[t], 'C: jobs can only start at take{0} for server {1}'.format(t, m))
 
-    pladdLPM.addConstr(quicksum(y) <= K, 'C: sum(y) <= k')
+    pladdLPM.addConstr(quicksum(y) <= (K+1), 'C: sum(y) <= k')
 
 
     pladdLPM.optimize()

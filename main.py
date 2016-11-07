@@ -107,7 +107,7 @@ try:
             expr = LinExpr(0.0)
             expr.addTerms(1.0, z[m][t])
             for i in range(n):
-                expr.addTerms(1.0, quicksum(x[m][i][lb:ub]))
+                expr.add(quicksum(x[m][i][lb:ub]))
                 lb = t - length[m][i] + 1
                 ub = t
                 lb = max(lb, 0)

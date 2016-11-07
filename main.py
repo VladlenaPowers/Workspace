@@ -96,7 +96,7 @@ try:
             for j in range(n):
                 if (i < j):
                     for t in range(T+1):
-                        lb = t-length[m][j]+1
+                        lb = t-length[m][i]+1
                         lb = max(lb, 0)
                         pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][lb:]) <= 1.0, 'C: jobs before job{0} must end before job{1} starts for server{2}'.format(j, j, m))
 

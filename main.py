@@ -106,11 +106,11 @@ try:
         for t in range(T+1):
             expr = LinExpr(0.0)
             expr.addTerms(1.0, z[m][t])
-            for i in range(n):
-                lb = t - length[m][i] + 1
+            for j in range(n):
+                lb = t - length[m][j] + 1
                 ub = t
                 lb = max(lb, 0)
-                expr.add(quicksum(x[m][i][lb:ub]))
+                expr.add(quicksum(x[m][j][lb:ub]))
             pladdLPM.addConstr(expr >= 1.0, 'C: idle time constaint for m{0}, t{1}'.format(m, t))
 
 

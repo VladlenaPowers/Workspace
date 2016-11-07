@@ -130,7 +130,7 @@ try:
 
 
 except GurobiError as err:
-    print('Encountered a Gurobi ERROR: {0}'.format(err))
+    print('Gurobi ERROR({0}): {1}'.format(err.errno, err.message))
 
 except AttributeError as err:
     print('Encountered an attribute error: {0}'.format(err))

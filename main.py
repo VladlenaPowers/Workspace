@@ -88,7 +88,8 @@ try:
             for j in range(n):
                 if (i > j):
                     for t in range(T+1):
-                        ub = t+length[m][j] - 1 + 1 # Since t uses zero-based indexes we don't need to subtract 1 from the original upper bound. We do add 1 because slicing an array means for each index i st. lb <= i < ub
+                        ub = t+length[m][j] - 1
+                        ub = min(ub, T+sumOfLengthServerJobs[m])
                         pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][:ub]) <= 1.0, 'C: jobs after job{0} must start after job{1} ends for server{2}'.format(j, j, m))
 
     # Jobs with an index less than j must end before j starts
@@ -98,7 +99,7 @@ try:
             for j in range(n):
                 if (i < j):
                     for t in range(T+1):
-                        lb = t-length[m][j]+1 # Since t uses zero-based indexes we don't need to subtract 1 from the original lower bound
+                        lb = t-length[m][j]+1
                         lb = max(lb, 0)
                         pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][lb:]) <= 1.0, 'C: jobs before job{0} must end before job{1} starts for server{2}'.format(j, j, m))
 
@@ -109,10 +110,10 @@ try:
             expr = LinExpr(0.0)
             expr.addTerms(1.0, z[m][t])
             for i in range(n):
-                lb = t - length[m][i] + 1 # Since t uses zero-based indexes we don't need to subtract 1 from the original lower bound
-                ub = t + 1 # Since t uses zero-based indexes we don't need to subtract 1 from the original upper bound. We do add 1 because slicing an array means for each index i st. lb <= i < ub
-                lb = min(lb, 0)
                 expr.addTerms(1.0, quicksum(x[m][i][lb:ub]))
+                lb = t - length[m][i] + 1
+                ub = t
+                lb = max(lb, 0)
             pladdLPM.addConstr(expr >= 1.0, 'C: idle time constaint for m{0}, t{1}'.format(m, t))
 
 

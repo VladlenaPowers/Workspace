@@ -51,8 +51,14 @@ try:
         sumOfLengthServerJobs.append(sumOfLengths)
         print('{0}{1} = {2}'.format('length of jobs on server', i, sumOfLengths))
 
+
+    open('output.txt', 'w').close()
+
     # Create a new model
     pladdLPM = Model("model0")
+
+    pladdLPM.setParam("LogFile", "output.txt")
+    pladdLPM.setParam("LogToConsole", 0)
 
     z = []
     zSum = LinExpr(0.0)
@@ -152,6 +158,11 @@ try:
     print('y')
     for t in range(T+1):
         print('[' + str(y[t].x) +']')
+
+    outputFile = open('output.txt','rb')
+    for line in outputFile:
+        if 'Root relaxation:' in line or 'Best objective' in line:
+             print(line)
 
 except GurobiError as err:
     print('Gurobi ERROR({0}): {1}'.format(err.errno, err.message))

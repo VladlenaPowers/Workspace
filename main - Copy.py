@@ -32,10 +32,10 @@ def preprocessing(T,K,serverjobs):
 
 try:
 
-
-    length = [[1,4,1,1,4],[3,3,3,2]]
+    length = [[1,3,1,1,5],[3,3,3,2]]
     T = 10
     K = 4
+
     M = len(length)
     for i in range (M):
         print('{3}{0}{1} = {2}'.format('server ', i, length[i],"Before preprocessing  "))
@@ -60,7 +60,7 @@ try:
         zRow = []
         for t in range(T+1):
             varName = 'Z_m{0}_t{1}'.format(m, t)
-            idle = pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.BINARY, name=varName)
+            idle = pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name=varName)
             zSum.addTerms(1.0, idle)
             zRow.append(idle)
         z.append(zRow)
@@ -72,13 +72,13 @@ try:
         for j in range(n):
             thisJobStarts = []
             for t in range(T+sumOfLengthServerJobs[m]+1):
-                thisJobStarts.append(pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.BINARY, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
+                thisJobStarts.append(pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='X_m{0}_j{1}_t{2}'.format(m, j, t)))
             jobStartTimes.append(thisJobStarts)
         x.append(jobStartTimes)
 
     y = []
     for t in range(T+1):
-        y.append(pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.BINARY, name='Y_t{0}'.format(t)))
+        y.append(pladdLPM.addVar(lb=0.0, ub=1.0, vtype=GRB.CONTINUOUS, name='Y_t{0}'.format(t)))
 
     pladdLPM.update()
     pladdLPM.setObjective(zSum, GRB.MINIMIZE)
@@ -88,12 +88,41 @@ try:
         for j in range(n):
             pladdLPM.addConstr(quicksum(x[m][j]) == 1.0, 'C: every job scheduled for server {0}'.format(m))
 
+    # # For a job j, jobs with a greater index much start after j ends
+    # for m in range(M):
+    #     n = len(length[m])
+    #     for i in range(n):
+    #         for j in range(n):
+    #             if (i > j):
+    #                 for t in range(T+sumOfLengthServerJobs[m]+1):
+    #                     ub = t+length[m][j] - 1 + 1
+    #                     ub = min(ub, T+sumOfLengthServerJobs[m]+1)
+    #                     pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][:ub]) <= 1.0, 'C: jobs after job{0} must start after job{1} ends for server{2}'.format(j, j, m))
+
+    # Jobs with an index less than j must end before j starts
+    # for m in range(M):
+    #     n = len(length[m])
+    #     for i in range(n):
+    #         for j in range(n):
+    #             if (i < j):
+    #                 for t in range(T+sumOfLengthServerJobs[m]+1):
+    #                     lb = t-length[m][i]+1
+    #                     lb = max(lb, 0)
+    #                     pladdLPM.addConstr(x[m][j][t] + quicksum(x[m][i][lb:]) <= 1.0, 'C: jobs before job{0} must end before job{1} starts for server{2}'.format(j, j, m))
+
+
+
+
+
+
+
+
     # For a job j, jobs with a greater index much start after j ends
     for m in range(M):
         n = len(length[m])
         for i in range(n):
             for j in range(n):
-                if (i > j):
+                if (i == j + 1):
                     for t in range(T+sumOfLengthServerJobs[m]+1):
                         ub = t+length[m][j] - 1 + 1
                         ub = min(ub, T+sumOfLengthServerJobs[m]+1)
@@ -105,12 +134,19 @@ try:
         n = len(length[m])
         for i in range(n):
             for j in range(n):
-                if (i < j):
+                if (i + 1 == j):
                     for t in range(T+sumOfLengthServerJobs[m]+1):
                         lb = t-length[m][i]+1
                         lb = max(lb, 0)
                         ub2 = max(0,t-length[m][j]+1)
                         pladdLPM.addConstr(quicksum(x[m][j][0:t+1]) + quicksum(x[m][i][lb:]) <= 1.0, 'C: jobs before job{0} must end before job{1} starts for server{2}'.format(j, j, m))
+
+
+
+
+
+
+
 
 
     # Calculate idle time
